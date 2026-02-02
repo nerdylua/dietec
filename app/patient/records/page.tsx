@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ThemeToggle } from '@/components/theme-toggle'
 import {
     ArrowLeft,
@@ -14,10 +14,9 @@ import {
     AlertTriangle,
     Stethoscope,
     ChevronDown,
-    ChevronUp,
-    Calendar,
     FileText,
-    Check
+    X,
+    Save
 } from 'lucide-react'
 
 interface MedicalRecord {
@@ -47,11 +46,39 @@ export default function MedicalHistoryPage() {
     const [records, setRecords] = useState<MedicalRecord[]>(mockRecords)
     const [expandedId, setExpandedId] = useState<string | null>(null)
     const [filter, setFilter] = useState<string>('all')
+    const [showAddModal, setShowAddModal] = useState(false)
+    const [newRecord, setNewRecord] = useState({
+        type: 'condition' as MedicalRecord['type'],
+        name: '',
+        details: '',
+        date: '',
+        status: 'active' as 'active' | 'resolved'
+    })
 
     const filteredRecords = records.filter(r => filter === 'all' || r.type === filter)
 
     const toggleExpand = (id: string) => {
         setExpandedId(expandedId === id ? null : id)
+    }
+
+    const addRecord = () => {
+        if (!newRecord.name.trim()) return
+        const record: MedicalRecord = {
+            id: Date.now().toString(),
+            type: newRecord.type,
+            name: newRecord.name,
+            details: newRecord.details,
+            date: newRecord.date || undefined,
+            status: newRecord.status
+        }
+        setRecords(prev => [record, ...prev])
+        setShowAddModal(false)
+        setNewRecord({ type: 'condition', name: '', details: '', date: '', status: 'active' })
+    }
+
+    const deleteRecord = (id: string) => {
+        setRecords(prev => prev.filter(r => r.id !== id))
+        setExpandedId(null)
     }
 
     return (
@@ -85,6 +112,7 @@ export default function MedicalHistoryPage() {
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
+                            onClick={() => setShowAddModal(true)}
                             className="h-9 px-4 rounded-lg bg-[#171717] dark:bg-white text-white dark:text-[#171717] text-[13px] font-medium flex items-center gap-2"
                         >
                             <Plus className="w-4 h-4" />
@@ -108,8 +136,8 @@ export default function MedicalHistoryPage() {
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setFilter(f)}
                             className={`px-4 py-2 rounded-full text-[13px] font-medium whitespace-nowrap transition-colors ${filter === f
-                                    ? 'bg-[#171717] dark:bg-white text-white dark:text-[#171717]'
-                                    : 'bg-[#F5F5F5] dark:bg-[#222] text-[#666] dark:text-[#888] hover:bg-[#EAEAEA] dark:hover:bg-[#333]'
+                                ? 'bg-[#171717] dark:bg-white text-white dark:text-[#171717]'
+                                : 'bg-[#F5F5F5] dark:bg-[#222] text-[#666] dark:text-[#888] hover:bg-[#EAEAEA] dark:hover:bg-[#333]'
                                 }`}
                         >
                             {f === 'all' ? 'All Records' : typeConfig[f as keyof typeof typeConfig]?.label}
@@ -192,6 +220,7 @@ export default function MedicalHistoryPage() {
                                                 <motion.button
                                                     whileHover={{ scale: 1.05 }}
                                                     whileTap={{ scale: 0.95 }}
+                                                    onClick={() => deleteRecord(record.id)}
                                                     className="h-8 px-3 rounded-lg border border-red-200 dark:border-red-500/30 text-[13px] text-red-500 flex items-center gap-1.5 hover:bg-red-50 dark:hover:bg-red-500/10"
                                                 >
                                                     <Trash2 className="w-3.5 h-3.5" />
@@ -214,10 +243,142 @@ export default function MedicalHistoryPage() {
                         className="text-center py-16"
                     >
                         <FileText className="w-12 h-12 text-[#CCC] mx-auto mb-4" />
-                        <p className="text-[15px] text-[#666] dark:text-[#888]">No records found</p>
+                        <p className="text-[15px] text-[#666] dark:text-[#888] mb-4">No records found</p>
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setShowAddModal(true)}
+                            className="h-10 px-6 rounded-lg bg-[#171717] dark:bg-white text-white dark:text-[#171717] text-[14px] font-medium inline-flex items-center gap-2"
+                        >
+                            <Plus className="w-4 h-4" />
+                            Add Your First Record
+                        </motion.button>
                     </motion.div>
                 )}
             </main>
+
+            {/* Add Record Modal */}
+            <AnimatePresence>
+                {showAddModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+                        onClick={() => setShowAddModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            onClick={e => e.stopPropagation()}
+                            className="bg-white dark:bg-[#111] rounded-2xl p-6 w-full max-w-md"
+                        >
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-[18px] font-semibold text-[#171717] dark:text-white">Add Medical Record</h3>
+                                <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-[#F5F5F5] dark:hover:bg-[#222] rounded-lg">
+                                    <X className="w-5 h-5 text-[#666]" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                {/* Type Selection */}
+                                <div>
+                                    <label className="block text-[13px] font-medium text-[#666] dark:text-[#888] mb-2">Type</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {(['condition', 'allergy', 'medication', 'surgery'] as const).map(type => {
+                                            const config = typeConfig[type]
+                                            return (
+                                                <motion.button
+                                                    key={type}
+                                                    whileTap={{ scale: 0.98 }}
+                                                    onClick={() => setNewRecord(prev => ({ ...prev, type }))}
+                                                    className={`p-3 rounded-lg text-left text-[13px] flex items-center gap-2 transition-colors ${newRecord.type === type
+                                                        ? `${config.bg} ${config.color} border-2 border-current`
+                                                        : 'border border-[#EAEAEA] dark:border-[#333] text-[#666] dark:text-[#888] hover:bg-[#F5F5F5] dark:hover:bg-[#222]'
+                                                        }`}
+                                                >
+                                                    <config.icon className="w-4 h-4" />
+                                                    {config.label}
+                                                </motion.button>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Name */}
+                                <div>
+                                    <label className="block text-[13px] font-medium text-[#666] dark:text-[#888] mb-2">Name *</label>
+                                    <input
+                                        type="text"
+                                        value={newRecord.name}
+                                        onChange={e => setNewRecord(prev => ({ ...prev, name: e.target.value }))}
+                                        placeholder="e.g., Diabetes, Penicillin, Metformin"
+                                        className="w-full h-11 px-4 rounded-xl border border-[#EAEAEA] dark:border-[#333] bg-white dark:bg-[#0A0A0A] text-[14px] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                    />
+                                </div>
+
+                                {/* Details */}
+                                <div>
+                                    <label className="block text-[13px] font-medium text-[#666] dark:text-[#888] mb-2">Details</label>
+                                    <textarea
+                                        value={newRecord.details}
+                                        onChange={e => setNewRecord(prev => ({ ...prev, details: e.target.value }))}
+                                        placeholder="Additional information..."
+                                        rows={3}
+                                        className="w-full px-4 py-3 rounded-xl border border-[#EAEAEA] dark:border-[#333] bg-white dark:bg-[#0A0A0A] text-[14px] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+                                    />
+                                </div>
+
+                                {/* Date */}
+                                <div>
+                                    <label className="block text-[13px] font-medium text-[#666] dark:text-[#888] mb-2">Date (optional)</label>
+                                    <input
+                                        type="date"
+                                        value={newRecord.date}
+                                        onChange={e => setNewRecord(prev => ({ ...prev, date: e.target.value }))}
+                                        className="w-full h-11 px-4 rounded-xl border border-[#EAEAEA] dark:border-[#333] bg-white dark:bg-[#0A0A0A] text-[14px] focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                    />
+                                </div>
+
+                                {/* Status */}
+                                <div>
+                                    <label className="block text-[13px] font-medium text-[#666] dark:text-[#888] mb-2">Status</label>
+                                    <div className="flex gap-2">
+                                        {(['active', 'resolved'] as const).map(status => (
+                                            <motion.button
+                                                key={status}
+                                                whileTap={{ scale: 0.98 }}
+                                                onClick={() => setNewRecord(prev => ({ ...prev, status }))}
+                                                className={`flex-1 h-10 rounded-lg text-[13px] font-medium transition-colors ${newRecord.status === status
+                                                    ? status === 'active'
+                                                        ? 'bg-emerald-500 text-white'
+                                                        : 'bg-[#666] text-white'
+                                                    : 'border border-[#EAEAEA] dark:border-[#333] text-[#666] dark:text-[#888]'
+                                                    }`}
+                                            >
+                                                {status.charAt(0).toUpperCase() + status.slice(1)}
+                                            </motion.button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Submit */}
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={addRecord}
+                                    disabled={!newRecord.name.trim()}
+                                    className="w-full h-12 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white text-[14px] font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <Save className="w-4 h-4" />
+                                    Add Record
+                                </motion.button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }

@@ -308,14 +308,16 @@ export function PatientDashboardClient({ user }: PatientDashboardClientProps) {
                                 Add your medical history, allergies, and current medications to get personalized AI-powered health insights.
                             </p>
                         </div>
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="relative z-10 h-12 px-6 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white text-[14px] font-medium flex items-center gap-2 shadow-lg hover:shadow-xl transition-shadow flex-shrink-0"
-                        >
-                            <Sparkles className="w-4 h-4" />
-                            Complete Profile
-                        </motion.button>
+                        <Link href="/patient/settings">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="relative z-10 h-12 px-6 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white text-[14px] font-medium flex items-center gap-2 shadow-lg hover:shadow-xl transition-shadow flex-shrink-0"
+                            >
+                                <Sparkles className="w-4 h-4" />
+                                Complete Profile
+                            </motion.button>
+                        </Link>
                     </div>
                 </AnimatedCard>
             </main>
