@@ -30,10 +30,10 @@ interface Appointment {
 }
 
 const mockAppointments: Appointment[] = [
-    { id: '1', doctor: 'Dr. Sarah Johnson', specialty: 'General Physician', date: '2024-02-05', time: '10:00 AM', type: 'Consultation', status: 'upcoming' },
-    { id: '2', doctor: 'Dr. Michael Chen', specialty: 'Cardiologist', date: '2024-02-08', time: '2:30 PM', type: 'Follow-up', status: 'upcoming' },
-    { id: '3', doctor: 'Dr. Emily Williams', specialty: 'Dermatologist', date: '2024-01-28', time: '11:00 AM', type: 'Check-up', status: 'completed' },
-    { id: '4', doctor: 'Dr. James Brown', specialty: 'Pediatrician', date: '2024-01-20', time: '9:00 AM', type: 'Consultation', status: 'cancelled' },
+    { id: '1', doctor: 'Dr. Ananya Sharma', specialty: 'General Physician', date: '2024-02-05', time: '10:00 AM', type: 'Consultation', status: 'upcoming' },
+    { id: '2', doctor: 'Dr. Arjun Mehta', specialty: 'Cardiologist', date: '2024-02-08', time: '2:30 PM', type: 'Follow-up', status: 'upcoming' },
+    { id: '3', doctor: 'Dr. Kavya Iyer', specialty: 'Dermatologist', date: '2024-01-28', time: '11:00 AM', type: 'Check-up', status: 'completed' },
+    { id: '4', doctor: 'Dr. Rohan Desai', specialty: 'Pediatrician', date: '2024-01-20', time: '9:00 AM', type: 'Consultation', status: 'cancelled' },
 ]
 
 const statusConfig = {

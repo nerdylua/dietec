@@ -30,10 +30,10 @@ interface Bill {
 }
 
 const mockBills: Bill[] = [
-    { id: '1', description: 'Consultation - Dr. Sarah Johnson', category: 'consultation', date: '2024-02-05', amount: 500, status: 'pending', invoiceNo: 'INV-2024-001' },
+    { id: '1', description: 'Consultation - Dr. Priya Patel', category: 'consultation', date: '2024-02-05', amount: 500, status: 'pending', invoiceNo: 'INV-2024-001' },
     { id: '2', description: 'Lab Test - Complete Blood Count', category: 'lab_test', date: '2024-02-04', amount: 299, status: 'pending', invoiceNo: 'INV-2024-002' },
     { id: '3', description: 'Medicines Order #1234', category: 'medicine', date: '2024-01-30', amount: 1250, status: 'paid', invoiceNo: 'INV-2024-003' },
-    { id: '4', description: 'Follow-up - Dr. Michael Chen', category: 'appointment', date: '2024-01-28', amount: 300, status: 'paid', invoiceNo: 'INV-2024-004' },
+    { id: '4', description: 'Follow-up - Dr. Arjun Mehta', category: 'appointment', date: '2024-01-28', amount: 300, status: 'paid', invoiceNo: 'INV-2024-004' },
     { id: '5', description: 'Lab Test - Thyroid Profile', category: 'lab_test', date: '2024-01-15', amount: 599, status: 'overdue', invoiceNo: 'INV-2024-005' },
 ]
 

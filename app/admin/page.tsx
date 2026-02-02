@@ -179,9 +179,9 @@ export default async function AdminDashboard() {
                         </div>
                         <div className="divide-y divide-[#EAEAEA] dark:divide-[#333]">
                             {[
-                                { name: 'John Smith', email: 'john@example.com', role: 'Patient', joined: '2 hours ago' },
+                                { name: 'Rajesh Sharma', email: 'rajesh@example.com', role: 'Patient', joined: '2 hours ago' },
                                 { name: 'Dr. Emma Wilson', email: 'emma@hospital.com', role: 'Doctor', joined: '5 hours ago' },
-                                { name: 'Michael Brown', email: 'michael@example.com', role: 'Patient', joined: '1 day ago' },
+                                { name: 'Amit Kumar', email: 'amit@example.com', role: 'Patient', joined: '1 day ago' },
                             ].map((user, i) => (
                                 <div key={i} className="p-4 flex items-center justify-between hover:bg-[#FAFAFA] dark:hover:bg-[#1A1A1A] transition-colors">
                                     <div className="flex items-center gap-4">

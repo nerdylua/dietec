@@ -30,11 +30,11 @@ interface Appointment {
 }
 
 const todayAppointments: Appointment[] = [
-    { id: '1', patient: 'John Smith', age: 35, gender: 'Male', time: '9:00 AM', type: 'Consultation', status: 'completed', notes: 'Follow-up on blood pressure' },
-    { id: '2', patient: 'Sarah Williams', age: 28, gender: 'Female', time: '10:00 AM', type: 'Check-up', status: 'in_progress' },
-    { id: '3', patient: 'Michael Brown', age: 45, gender: 'Male', time: '11:00 AM', type: 'Follow-up', status: 'waiting' },
-    { id: '4', patient: 'Emily Davis', age: 22, gender: 'Female', time: '2:00 PM', type: 'Consultation', status: 'waiting' },
-    { id: '5', patient: 'Robert Johnson', age: 55, gender: 'Male', time: '3:00 PM', type: 'Consultation', status: 'cancelled' },
+    { id: '1', patient: 'Rajesh Sharma', age: 35, gender: 'Male', time: '9:00 AM', type: 'Consultation', status: 'completed', notes: 'Follow-up on blood pressure' },
+    { id: '2', patient: 'Priya Patel', age: 28, gender: 'Female', time: '10:00 AM', type: 'Check-up', status: 'in_progress' },
+    { id: '3', patient: 'Amit Kumar', age: 45, gender: 'Male', time: '11:00 AM', type: 'Follow-up', status: 'waiting' },
+    { id: '4', patient: 'Sneha Reddy', age: 22, gender: 'Female', time: '2:00 PM', type: 'Consultation', status: 'waiting' },
+    { id: '5', patient: 'Vikram Singh', age: 55, gender: 'Male', time: '3:00 PM', type: 'Consultation', status: 'cancelled' },
 ]
 
 const statusConfig = {

@@ -1,11 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { streamText } from 'ai'
+import { openai } from '@ai-sdk/openai'
 import { createClient } from '@/lib/supabase/server'
 
 // Rate limiting configuration
 const RATE_LIMIT = {
     INPUT_MAX_CHARS: 1000,      // Max characters per user message
-    INPUT_MAX_TOKENS: 300,      // Approximate max tokens for input
-    OUTPUT_MAX_TOKENS: 500,     // Max tokens for AI response
     REQUESTS_PER_MINUTE: 10,    // Max requests per minute per user
     CONTEXT_MESSAGES: 6,        // Max previous messages to include
 }
@@ -30,52 +29,46 @@ function checkRateLimit(userId: string): boolean {
     return true
 }
 
-// Rough token estimation (1 token ≈ 4 characters)
-function estimateTokens(text: string): number {
-    return Math.ceil(text.length / 4)
-}
-
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
     try {
         const supabase = await createClient()
         const { data: { user } } = await supabase.auth.getUser()
 
         if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+            return new Response(JSON.stringify({ error: 'Unauthorized' }), { 
+                status: 401,
+                headers: { 'Content-Type': 'application/json' }
+            })
         }
 
         // Check rate limit
         if (!checkRateLimit(user.id)) {
-            return NextResponse.json({
+            return new Response(JSON.stringify({
                 error: 'Rate limit exceeded. Please wait a minute before sending more messages.',
                 rateLimited: true
-            }, { status: 429 })
+            }), { 
+                status: 429,
+                headers: { 'Content-Type': 'application/json' }
+            })
         }
 
         const { message, conversationHistory = [] } = await request.json()
 
         if (!message) {
-            return NextResponse.json({ error: 'Message is required' }, { status: 400 })
+            return new Response(JSON.stringify({ error: 'Message is required' }), { 
+                status: 400,
+                headers: { 'Content-Type': 'application/json' }
+            })
         }
 
         // Validate input length
         if (message.length > RATE_LIMIT.INPUT_MAX_CHARS) {
-            return NextResponse.json({
+            return new Response(JSON.stringify({
                 error: `Message too long. Maximum ${RATE_LIMIT.INPUT_MAX_CHARS} characters allowed.`
-            }, { status: 400 })
-        }
-
-        const inputTokens = estimateTokens(message)
-        if (inputTokens > RATE_LIMIT.INPUT_MAX_TOKENS) {
-            return NextResponse.json({
-                error: 'Message too long. Please keep it shorter.'
-            }, { status: 400 })
-        }
-
-        const apiKey = process.env.OPENAI_API_KEY
-
-        if (!apiKey) {
-            return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 })
+            }), { 
+                status: 400,
+                headers: { 'Content-Type': 'application/json' }
+            })
         }
 
         const systemPrompt = `You are a helpful AI Health Advisor for DIETEC Healthcare, a modern healthcare platform. Your role is to:
@@ -103,49 +96,29 @@ Remember: You are an AI assistant, not a doctor. Always prioritize user safety.`
         // Limit conversation history
         const limitedHistory = conversationHistory.slice(-RATE_LIMIT.CONTEXT_MESSAGES)
 
-        const messages = [
-            { role: 'system', content: systemPrompt },
-            ...limitedHistory,
-            { role: 'user', content: message }
+        const messages: { role: 'user' | 'assistant'; content: string }[] = [
+            ...limitedHistory.map((msg: { role: string; content: string }) => ({
+                role: msg.role as 'user' | 'assistant',
+                content: msg.content
+            })),
+            { role: 'user' as const, content: message }
         ]
 
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: 'gpt-4o-mini',
-                messages,
-                temperature: 0.7,
-                max_tokens: RATE_LIMIT.OUTPUT_MAX_TOKENS,
-                presence_penalty: 0.1,
-                frequency_penalty: 0.1
-            })
+        const result = streamText({
+            model: openai('gpt-4o-mini'),
+            system: systemPrompt,
+            messages,
+            temperature: 0.7,
+            maxOutputTokens: 500
         })
 
-        if (!response.ok) {
-            const error = await response.json()
-            console.error('OpenAI API error:', error)
-            return NextResponse.json({ error: 'Failed to get AI response' }, { status: 500 })
-        }
-
-        const data = await response.json()
-        const aiMessage = data.choices[0]?.message?.content || 'I apologize, but I could not generate a response. Please try again.'
-        const usage = data.usage
-
-        return NextResponse.json({
-            message: aiMessage,
-            usage: {
-                promptTokens: usage?.prompt_tokens,
-                completionTokens: usage?.completion_tokens,
-                totalTokens: usage?.total_tokens
-            }
-        })
+        return result.toTextStreamResponse()
 
     } catch (error) {
         console.error('Chat API error:', error)
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+        return new Response(JSON.stringify({ error: 'Internal server error' }), { 
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        })
     }
 }

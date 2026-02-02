@@ -15,10 +15,10 @@ import {
 } from 'lucide-react'
 
 const doctors = [
-    { id: 1, name: 'Dr. Sarah Johnson', specialty: 'General Physician', available: true, nextSlot: '10:00 AM' },
-    { id: 2, name: 'Dr. Michael Chen', specialty: 'Cardiologist', available: true, nextSlot: '11:30 AM' },
-    { id: 3, name: 'Dr. Emily Williams', specialty: 'Dermatologist', available: false, nextSlot: 'Tomorrow' },
-    { id: 4, name: 'Dr. James Brown', specialty: 'Pediatrician', available: true, nextSlot: '2:00 PM' },
+    { id: 1, name: 'Dr. Ananya Sharma', specialty: 'General Physician', available: true, nextSlot: '10:00 AM' },
+    { id: 2, name: 'Dr. Arjun Mehta', specialty: 'Cardiologist', available: true, nextSlot: '11:30 AM' },
+    { id: 3, name: 'Dr. Kavya Iyer', specialty: 'Dermatologist', available: false, nextSlot: 'Tomorrow' },
+    { id: 4, name: 'Dr. Rohan Desai', specialty: 'Pediatrician', available: true, nextSlot: '2:00 PM' },
 ]
 
 const timeSlots = [

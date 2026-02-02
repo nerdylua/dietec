@@ -45,9 +45,9 @@ export default async function DoctorDashboard() {
 
     // Mock data for demonstration
     const todayAppointments = [
-        { id: 1, patient: 'John Smith', time: '09:00 AM', type: 'Consultation', status: 'upcoming' },
+        { id: 1, patient: 'Rajesh Sharma', time: '09:00 AM', type: 'Consultation', status: 'upcoming' },
         { id: 2, patient: 'Emma Wilson', time: '10:30 AM', type: 'Follow-up', status: 'upcoming' },
-        { id: 3, patient: 'Michael Brown', time: '02:00 PM', type: 'Check-up', status: 'upcoming' },
+        { id: 3, patient: 'Amit Kumar', time: '02:00 PM', type: 'Check-up', status: 'upcoming' },
     ]
 
     return (

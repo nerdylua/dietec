@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { gsap } from 'gsap'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { logout } from '@/app/(auth)/actions'
 import {
     LogOut,
     Home,
@@ -103,11 +104,7 @@ export function PatientDashboardClient({ user }: PatientDashboardClientProps) {
     }, [])
 
     const handleLogout = async () => {
-        const form = document.createElement('form')
-        form.action = '/api/auth/logout'
-        form.method = 'POST'
-        document.body.appendChild(form)
-        form.submit()
+        await logout()
     }
 
     return (
@@ -177,16 +174,6 @@ export function PatientDashboardClient({ user }: PatientDashboardClientProps) {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="hidden sm:flex items-center gap-2 h-9 px-3 rounded-lg border border-[#EAEAEA] dark:border-[#333] text-[#666] dark:text-[#888] text-[13px] hover:border-[#CCC] dark:hover:border-[#555] transition-colors"
-                        >
-                            <Search className="w-4 h-4" />
-                            <span>Search...</span>
-                            <kbd className="ml-2 px-1.5 py-0.5 text-[11px] bg-[#F5F5F5] dark:bg-[#222] rounded">⌘K</kbd>
-                        </motion.button>
-
                         <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}

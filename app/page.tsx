@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
 import { gsap } from 'gsap'
-import { ThemeToggle } from '@/components/theme-toggle'
 import {
   ScrollFadeIn,
   FloatingOrb,
@@ -62,10 +61,10 @@ const features = [
 ]
 
 const highlights = [
-  { icon: Stethoscope, label: 'Expert Doctors', value: '500+', desc: 'Verified specialists' },
-  { icon: Users, label: 'Happy Patients', value: '10K+', desc: 'Trust us daily' },
-  { icon: Clock, label: 'AI Response', value: '<3s', desc: 'Instant answers' },
-  { icon: Shield, label: 'Data Security', value: '100%', desc: 'HIPAA compliant' },
+  { icon: Stethoscope, label: 'Doctors Onboarded', value: '12+', desc: 'Active medical professionals' },
+  { icon: Users, label: 'Patients Registered', value: '200+', desc: 'Growing user community' },
+  { icon: Clock, label: 'Avg. Booking Time', value: '2 min', desc: 'Quick appointment setup' },
+  { icon: Shield, label: 'Data Protected', value: '100%', desc: 'End-to-end encrypted' },
 ]
 
 const capabilities = [
@@ -178,7 +177,6 @@ export default function LandingPage() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <ThemeToggle />
             <Link href="/login">
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -561,7 +559,7 @@ export default function LandingPage() {
             </div>
 
             <p className="text-sm text-white/40">
-              © 2024 DIETEC Healthcare. All rights reserved.
+              © 2026 DIETEC Healthcare. All rights reserved.
             </p>
 
             <div className="flex items-center gap-6">

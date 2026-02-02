@@ -62,6 +62,9 @@ export default function AIChatPage() {
             timestamp: new Date(),
         }
 
+        // Create a placeholder for the AI response
+        const aiMessageId = (Date.now() + 1).toString()
+
         setMessages(prev => [...prev, userMessage])
         setInput('')
         setIsLoading(true)
@@ -86,15 +89,38 @@ export default function AIChatPage() {
                 throw new Error('Failed to get response')
             }
 
-            const data = await response.json()
+            // Handle streaming response
+            const reader = response.body?.getReader()
+            const decoder = new TextDecoder()
 
-            const aiMessage: Message = {
-                id: (Date.now() + 1).toString(),
-                role: 'assistant',
-                content: data.message,
-                timestamp: new Date(),
+            if (!reader) {
+                throw new Error('No response body')
             }
-            setMessages(prev => [...prev, aiMessage])
+
+            // Add empty AI message that we'll update as we receive chunks
+            setMessages(prev => [...prev, {
+                id: aiMessageId,
+                role: 'assistant',
+                content: '',
+                timestamp: new Date(),
+            }])
+
+            let accumulatedContent = ''
+
+            while (true) {
+                const { done, value } = await reader.read()
+                if (done) break
+
+                const chunk = decoder.decode(value, { stream: true })
+                accumulatedContent += chunk
+
+                // Update the message with accumulated content
+                setMessages(prev => prev.map(msg =>
+                    msg.id === aiMessageId
+                        ? { ...msg, content: accumulatedContent }
+                        : msg
+                ))
+            }
         } catch (err) {
             setError('Failed to get AI response. Please try again.')
             console.error('Chat error:', err)
@@ -113,7 +139,7 @@ export default function AIChatPage() {
     }
 
     return (
-        <div className="min-h-screen bg-white dark:bg-[#0A0A0A] flex flex-col">
+        <div className="h-screen bg-white dark:bg-[#0A0A0A] flex flex-col overflow-hidden">
             {/* Header */}
             <header className="sticky top-0 z-50 h-16 border-b border-[#EAEAEA] dark:border-[#333] bg-white/80 dark:bg-[#0A0A0A]/80 backdrop-blur-xl flex-shrink-0">
                 <div className="h-full max-w-4xl mx-auto px-6 flex items-center justify-between">
@@ -150,8 +176,8 @@ export default function AIChatPage() {
             </header>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto">
-                <div className="max-w-4xl mx-auto px-6 py-6">
+            <div className="flex-1 overflow-y-auto min-h-0">
+                <div className="max-w-4xl mx-auto px-6 py-6 flex flex-col">
                     {/* Disclaimer */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -223,7 +249,7 @@ export default function AIChatPage() {
                             </motion.div>
                         ))}
 
-                        {isLoading && (
+                        {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
