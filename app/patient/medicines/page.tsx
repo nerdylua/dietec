@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ThemeToggle } from '@/components/theme-toggle'
 import {
     ArrowLeft,
@@ -11,8 +12,11 @@ import {
     Minus,
     ShoppingCart,
     X,
-    ChevronRight,
-    Check
+    Check,
+    CheckCircle,
+    CreditCard,
+    Truck,
+    Clock
 } from 'lucide-react'
 
 const medicines = [
@@ -24,9 +28,25 @@ const medicines = [
     { id: 6, name: 'Cetirizine 10mg', brand: 'Zyrtec', category: 'Allergy', price: 35, prescription: false, inStock: false },
     { id: 7, name: 'Pantoprazole 40mg', brand: 'Pan-D', category: 'Digestive', price: 95, prescription: false, inStock: true },
     { id: 8, name: 'Amoxicillin 500mg', brand: 'Mox', category: 'Antibiotic', price: 85, prescription: true, inStock: true },
+    { id: 9, name: 'Ibuprofen 400mg', brand: 'Brufen', category: 'Pain Relief', price: 30, prescription: false, inStock: true },
+    { id: 10, name: 'Dolo 650mg', brand: 'Dolo', category: 'Pain Relief', price: 35, prescription: false, inStock: true },
+    { id: 11, name: 'Aspirin 75mg', brand: 'Ecosprin', category: 'Heart', price: 20, prescription: true, inStock: true },
+    { id: 12, name: 'Atorvastatin 10mg', brand: 'Atorva', category: 'Heart', price: 75, prescription: true, inStock: true },
+    { id: 13, name: 'Losartan 50mg', brand: 'Losar', category: 'Blood Pressure', price: 55, prescription: true, inStock: true },
+    { id: 14, name: 'Amlodipine 5mg', brand: 'Amlong', category: 'Blood Pressure', price: 40, prescription: true, inStock: true },
+    { id: 15, name: 'Levothyroxine 50mcg', brand: 'Thyronorm', category: 'Thyroid', price: 65, prescription: true, inStock: true },
+    { id: 16, name: 'Montelukast 10mg', brand: 'Montair', category: 'Allergy', price: 90, prescription: true, inStock: true },
+    { id: 17, name: 'Folic Acid 5mg', brand: 'Folvite', category: 'Vitamins', price: 25, prescription: false, inStock: true },
+    { id: 18, name: 'Vitamin B12 1500mcg', brand: 'Neurobion', category: 'Vitamins', price: 180, prescription: false, inStock: true },
+    { id: 19, name: 'Calcium + D3', brand: 'Shelcal', category: 'Vitamins', price: 220, prescription: false, inStock: true },
+    { id: 20, name: 'Multivitamin', brand: 'Supradyn', category: 'Vitamins', price: 250, prescription: false, inStock: true },
+    { id: 21, name: 'Ranitidine 150mg', brand: 'Rantac', category: 'Digestive', price: 40, prescription: false, inStock: true },
+    { id: 22, name: 'Domperidone 10mg', brand: 'Domstal', category: 'Digestive', price: 50, prescription: false, inStock: true },
+    { id: 23, name: 'Loperamide 2mg', brand: 'Imodium', category: 'Digestive', price: 45, prescription: false, inStock: true },
+    { id: 24, name: 'ORS Powder', brand: 'Electral', category: 'Digestive', price: 15, prescription: false, inStock: true },
 ]
 
-const categories = ['All', 'Pain Relief', 'Antibiotic', 'Digestive', 'Diabetes', 'Vitamins', 'Allergy']
+const categories = ['All', 'Pain Relief', 'Antibiotic', 'Digestive', 'Diabetes', 'Vitamins', 'Allergy', 'Heart', 'Blood Pressure', 'Thyroid']
 
 interface CartItem {
     id: number
@@ -38,6 +58,9 @@ export default function MedicinesPage() {
     const [selectedCategory, setSelectedCategory] = useState('All')
     const [cart, setCart] = useState<CartItem[]>([])
     const [showCart, setShowCart] = useState(false)
+    const [showPayment, setShowPayment] = useState(false)
+    const [paymentProcessing, setPaymentProcessing] = useState(false)
+    const [paymentSuccess, setPaymentSuccess] = useState(false)
 
     const filteredMedicines = medicines.filter(med => {
         const matchesSearch = med.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -81,6 +104,26 @@ export default function MedicinesPage() {
 
     const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
 
+    const handleCheckout = () => {
+        setShowPayment(true)
+        setPaymentProcessing(true)
+
+        // Simulate payment processing
+        setTimeout(() => {
+            setPaymentProcessing(false)
+            setPaymentSuccess(true)
+        }, 2000)
+    }
+
+    const closePaymentModal = () => {
+        setShowPayment(false)
+        setPaymentSuccess(false)
+        if (paymentSuccess) {
+            setCart([])
+            setShowCart(false)
+        }
+    }
+
     return (
         <div className="min-h-screen bg-white dark:bg-[#0A0A0A]">
             {/* Grid background */}
@@ -102,21 +145,30 @@ export default function MedicinesPage() {
                         >
                             <ArrowLeft className="w-4 h-4" />
                         </Link>
-                        <h1 className="text-[15px] font-semibold text-[#171717] dark:text-white">Medicines</h1>
+                        <div>
+                            <h1 className="text-[15px] font-semibold text-[#171717] dark:text-white">Medicines</h1>
+                            <p className="text-[12px] text-[#666] dark:text-[#888]">{medicines.length} products</p>
+                        </div>
                     </div>
                     <div className="flex items-center gap-3">
                         <ThemeToggle />
-                        <button
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => setShowCart(true)}
                             className="relative w-9 h-9 rounded-lg flex items-center justify-center text-[#666] dark:text-[#888] hover:bg-[#F5F5F5] dark:hover:bg-[#222] transition-colors"
                         >
                             <ShoppingCart className="w-4 h-4" />
                             {cartCount > 0 && (
-                                <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#171717] dark:bg-white text-white dark:text-[#171717] text-[11px] font-medium rounded-full flex items-center justify-center">
+                                <motion.span
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 text-white text-[11px] font-medium rounded-full flex items-center justify-center"
+                                >
                                     {cartCount}
-                                </span>
+                                </motion.span>
                             )}
-                        </button>
+                        </motion.button>
                     </div>
                 </div>
             </header>
@@ -132,43 +184,52 @@ export default function MedicinesPage() {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Search medicines..."
-                                className="w-full h-11 pl-10 pr-4 rounded-xl border border-[#EAEAEA] dark:border-[#333] bg-white dark:bg-[#111] text-[14px] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#171717] dark:focus:ring-white focus:ring-offset-2 transition-shadow"
+                                className="w-full h-11 pl-10 pr-4 rounded-xl border border-[#EAEAEA] dark:border-[#333] bg-white dark:bg-[#111] text-[14px] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-shadow"
                             />
                         </div>
                     </div>
 
                     <div className="flex gap-2 overflow-x-auto pb-2">
                         {categories.map((cat) => (
-                            <button
+                            <motion.button
                                 key={cat}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
                                 onClick={() => setSelectedCategory(cat)}
                                 className={`px-4 py-2 rounded-full text-[13px] font-medium whitespace-nowrap transition-colors ${selectedCategory === cat
-                                        ? 'bg-[#171717] dark:bg-white text-white dark:text-[#171717]'
-                                        : 'bg-[#F5F5F5] dark:bg-[#222] text-[#666] dark:text-[#888] hover:bg-[#EAEAEA] dark:hover:bg-[#333]'
+                                    ? 'bg-emerald-500 text-white'
+                                    : 'bg-[#F5F5F5] dark:bg-[#222] text-[#666] dark:text-[#888] hover:bg-[#EAEAEA] dark:hover:bg-[#333]'
                                     }`}
                             >
                                 {cat}
-                            </button>
+                            </motion.button>
                         ))}
                     </div>
                 </div>
 
                 {/* Medicines Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredMedicines.map((med) => {
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {filteredMedicines.map((med, i) => {
                         const inCart = cart.find(item => item.id === med.id)
                         return (
-                            <div
+                            <motion.div
                                 key={med.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: i * 0.03 }}
+                                whileHover={{ y: -4 }}
                                 className={`p-5 rounded-xl border ${med.inStock
-                                        ? 'border-[#EAEAEA] dark:border-[#333] hover:border-[#CCC] dark:hover:border-[#555]'
-                                        : 'border-[#EAEAEA] dark:border-[#333] opacity-60'
-                                    } bg-white dark:bg-[#111] transition-colors`}
+                                    ? 'border-[#EAEAEA] dark:border-[#333] hover:border-emerald-300 dark:hover:border-emerald-500/50'
+                                    : 'border-[#EAEAEA] dark:border-[#333] opacity-60'
+                                    } bg-white dark:bg-[#111] transition-all`}
                             >
                                 <div className="flex items-start justify-between mb-3">
-                                    <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
+                                    <motion.div
+                                        whileHover={{ scale: 1.1, rotate: 5 }}
+                                        className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center"
+                                    >
                                         <Pill className="w-6 h-6 text-emerald-500" />
-                                    </div>
+                                    </motion.div>
                                     {med.prescription && (
                                         <span className="px-2 py-0.5 text-[11px] font-medium bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded">
                                             Rx
@@ -177,7 +238,8 @@ export default function MedicinesPage() {
                                 </div>
 
                                 <h3 className="text-[15px] font-medium text-[#171717] dark:text-white mb-1">{med.name}</h3>
-                                <p className="text-[13px] text-[#666] dark:text-[#888] mb-3">{med.brand}</p>
+                                <p className="text-[13px] text-[#666] dark:text-[#888] mb-1">{med.brand}</p>
+                                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mb-3">{med.category}</p>
 
                                 <div className="flex items-center justify-between">
                                     <span className="text-[18px] font-bold text-[#171717] dark:text-white">₹{med.price}</span>
@@ -185,125 +247,307 @@ export default function MedicinesPage() {
                                     {med.inStock ? (
                                         inCart ? (
                                             <div className="flex items-center gap-2">
-                                                <button
+                                                <motion.button
+                                                    whileTap={{ scale: 0.9 }}
                                                     onClick={() => updateQuantity(med.id, -1)}
                                                     className="w-8 h-8 rounded-lg border border-[#EAEAEA] dark:border-[#333] flex items-center justify-center text-[#666] hover:bg-[#F5F5F5] dark:hover:bg-[#222] transition-colors"
                                                 >
                                                     <Minus className="w-3 h-3" />
-                                                </button>
+                                                </motion.button>
                                                 <span className="w-8 text-center text-[14px] font-medium text-[#171717] dark:text-white">
                                                     {inCart.quantity}
                                                 </span>
-                                                <button
+                                                <motion.button
+                                                    whileTap={{ scale: 0.9 }}
                                                     onClick={() => addToCart(med.id)}
-                                                    className="w-8 h-8 rounded-lg bg-[#171717] dark:bg-white flex items-center justify-center text-white dark:text-[#171717] hover:bg-[#333] dark:hover:bg-[#EAEAEA] transition-colors"
+                                                    className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white hover:bg-emerald-600 transition-colors"
                                                 >
                                                     <Plus className="w-3 h-3" />
-                                                </button>
+                                                </motion.button>
                                             </div>
                                         ) : (
-                                            <button
+                                            <motion.button
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
                                                 onClick={() => addToCart(med.id)}
-                                                className="h-9 px-4 rounded-lg bg-[#171717] dark:bg-white text-white dark:text-[#171717] text-[13px] font-medium hover:bg-[#333] dark:hover:bg-[#EAEAEA] transition-colors flex items-center gap-1"
+                                                className="h-9 px-4 rounded-lg bg-emerald-500 text-white text-[13px] font-medium hover:bg-emerald-600 transition-colors flex items-center gap-1"
                                             >
                                                 <Plus className="w-3 h-3" />
                                                 Add
-                                            </button>
+                                            </motion.button>
                                         )
                                     ) : (
                                         <span className="text-[13px] text-[#999]">Out of stock</span>
                                     )}
                                 </div>
-                            </div>
+                            </motion.div>
                         )
                     })}
                 </div>
+
+                {filteredMedicines.length === 0 && (
+                    <div className="text-center py-16">
+                        <Pill className="w-12 h-12 text-[#CCC] mx-auto mb-4" />
+                        <p className="text-[15px] text-[#666] dark:text-[#888]">No medicines found</p>
+                    </div>
+                )}
             </main>
 
             {/* Cart Sidebar */}
-            {showCart && (
-                <>
-                    <div
-                        className="fixed inset-0 bg-black/50 z-50"
-                        onClick={() => setShowCart(false)}
-                    />
-                    <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white dark:bg-[#0A0A0A] z-50 flex flex-col">
-                        <div className="h-16 px-6 flex items-center justify-between border-b border-[#EAEAEA] dark:border-[#333]">
-                            <h2 className="text-[18px] font-semibold text-[#171717] dark:text-white">Cart ({cartCount})</h2>
-                            <button
-                                onClick={() => setShowCart(false)}
-                                className="w-9 h-9 rounded-lg flex items-center justify-center text-[#666] dark:text-[#888] hover:bg-[#F5F5F5] dark:hover:bg-[#222] transition-colors"
-                            >
-                                <X className="w-4 h-4" />
-                            </button>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto p-6">
-                            {cart.length === 0 ? (
-                                <div className="text-center py-12">
-                                    <ShoppingCart className="w-12 h-12 text-[#CCC] mx-auto mb-4" />
-                                    <p className="text-[15px] text-[#666] dark:text-[#888]">Your cart is empty</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    {cart.map((item) => {
-                                        const med = medicines.find(m => m.id === item.id)
-                                        if (!med) return null
-                                        return (
-                                            <div key={item.id} className="flex items-start gap-4 p-4 rounded-xl border border-[#EAEAEA] dark:border-[#333]">
-                                                <div className="w-12 h-12 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
-                                                    <Pill className="w-5 h-5 text-emerald-500" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-[14px] font-medium text-[#171717] dark:text-white truncate">{med.name}</p>
-                                                    <p className="text-[13px] text-[#666] dark:text-[#888]">₹{med.price} × {item.quantity}</p>
-                                                    <div className="flex items-center gap-2 mt-2">
-                                                        <button
-                                                            onClick={() => updateQuantity(item.id, -1)}
-                                                            className="w-7 h-7 rounded border border-[#EAEAEA] dark:border-[#333] flex items-center justify-center text-[#666] hover:bg-[#F5F5F5] dark:hover:bg-[#222]"
-                                                        >
-                                                            <Minus className="w-3 h-3" />
-                                                        </button>
-                                                        <span className="text-[13px] font-medium">{item.quantity}</span>
-                                                        <button
-                                                            onClick={() => addToCart(item.id)}
-                                                            className="w-7 h-7 rounded border border-[#EAEAEA] dark:border-[#333] flex items-center justify-center text-[#666] hover:bg-[#F5F5F5] dark:hover:bg-[#222]"
-                                                        >
-                                                            <Plus className="w-3 h-3" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-[14px] font-bold text-[#171717] dark:text-white">₹{med.price * item.quantity}</p>
-                                                    <button
-                                                        onClick={() => removeFromCart(item.id)}
-                                                        className="text-[12px] text-red-500 hover:underline mt-1"
-                                                    >
-                                                        Remove
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )
-                                    })}
-                                </div>
-                            )}
-                        </div>
-
-                        {cart.length > 0 && (
-                            <div className="p-6 border-t border-[#EAEAEA] dark:border-[#333]">
-                                <div className="flex items-center justify-between mb-4">
-                                    <span className="text-[15px] text-[#666] dark:text-[#888]">Total</span>
-                                    <span className="text-[24px] font-bold text-[#171717] dark:text-white">₹{cartTotal}</span>
-                                </div>
-                                <button className="w-full h-11 rounded-lg bg-emerald-600 text-white text-[14px] font-medium flex items-center justify-center gap-2 hover:bg-emerald-700 transition-colors">
-                                    <Check className="w-4 h-4" />
-                                    Proceed to Checkout
+            <AnimatePresence>
+                {showCart && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/50 z-50"
+                            onClick={() => setShowCart(false)}
+                        />
+                        <motion.div
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white dark:bg-[#0A0A0A] z-50 flex flex-col"
+                        >
+                            <div className="h-16 px-6 flex items-center justify-between border-b border-[#EAEAEA] dark:border-[#333]">
+                                <h2 className="text-[18px] font-semibold text-[#171717] dark:text-white">Cart ({cartCount})</h2>
+                                <button
+                                    onClick={() => setShowCart(false)}
+                                    className="w-9 h-9 rounded-lg flex items-center justify-center text-[#666] dark:text-[#888] hover:bg-[#F5F5F5] dark:hover:bg-[#222] transition-colors"
+                                >
+                                    <X className="w-4 h-4" />
                                 </button>
                             </div>
-                        )}
-                    </div>
-                </>
-            )}
+
+                            <div className="flex-1 overflow-y-auto p-6">
+                                {cart.length === 0 ? (
+                                    <div className="text-center py-12">
+                                        <ShoppingCart className="w-12 h-12 text-[#CCC] mx-auto mb-4" />
+                                        <p className="text-[15px] text-[#666] dark:text-[#888]">Your cart is empty</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {cart.map((item) => {
+                                            const med = medicines.find(m => m.id === item.id)
+                                            if (!med) return null
+                                            return (
+                                                <motion.div
+                                                    key={item.id}
+                                                    layout
+                                                    initial={{ opacity: 0, x: 20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    exit={{ opacity: 0, x: -20 }}
+                                                    className="flex items-start gap-4 p-4 rounded-xl border border-[#EAEAEA] dark:border-[#333]"
+                                                >
+                                                    <div className="w-12 h-12 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                                                        <Pill className="w-5 h-5 text-emerald-500" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-[14px] font-medium text-[#171717] dark:text-white truncate">{med.name}</p>
+                                                        <p className="text-[13px] text-[#666] dark:text-[#888]">₹{med.price} × {item.quantity}</p>
+                                                        <div className="flex items-center gap-2 mt-2">
+                                                            <button
+                                                                onClick={() => updateQuantity(item.id, -1)}
+                                                                className="w-7 h-7 rounded border border-[#EAEAEA] dark:border-[#333] flex items-center justify-center text-[#666] hover:bg-[#F5F5F5] dark:hover:bg-[#222]"
+                                                            >
+                                                                <Minus className="w-3 h-3" />
+                                                            </button>
+                                                            <span className="text-[13px] font-medium">{item.quantity}</span>
+                                                            <button
+                                                                onClick={() => addToCart(item.id)}
+                                                                className="w-7 h-7 rounded border border-[#EAEAEA] dark:border-[#333] flex items-center justify-center text-[#666] hover:bg-[#F5F5F5] dark:hover:bg-[#222]"
+                                                            >
+                                                                <Plus className="w-3 h-3" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-[14px] font-bold text-[#171717] dark:text-white">₹{med.price * item.quantity}</p>
+                                                        <button
+                                                            onClick={() => removeFromCart(item.id)}
+                                                            className="text-[12px] text-red-500 hover:underline mt-1"
+                                                        >
+                                                            Remove
+                                                        </button>
+                                                    </div>
+                                                </motion.div>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+
+                            {cart.length > 0 && (
+                                <div className="p-6 border-t border-[#EAEAEA] dark:border-[#333]">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <span className="text-[15px] text-[#666] dark:text-[#888]">Subtotal</span>
+                                        <span className="text-[15px] text-[#171717] dark:text-white">₹{cartTotal}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <span className="text-[15px] text-[#666] dark:text-[#888]">Delivery</span>
+                                        <span className="text-[15px] text-emerald-500">FREE</span>
+                                    </div>
+                                    <div className="flex items-center justify-between mb-6 pt-4 border-t border-[#EAEAEA] dark:border-[#333]">
+                                        <span className="text-[16px] font-medium text-[#171717] dark:text-white">Total</span>
+                                        <span className="text-[24px] font-bold text-[#171717] dark:text-white">₹{cartTotal}</span>
+                                    </div>
+                                    <motion.button
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={handleCheckout}
+                                        className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[14px] font-medium flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-shadow"
+                                    >
+                                        <CreditCard className="w-4 h-4" />
+                                        Pay with Razorpay
+                                    </motion.button>
+                                </div>
+                            )}
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* Razorpay Payment Modal */}
+            <AnimatePresence>
+                {showPayment && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
+                        onClick={paymentSuccess ? closePaymentModal : undefined}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            onClick={e => e.stopPropagation()}
+                            className="bg-white dark:bg-[#111] rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl"
+                        >
+                            {paymentProcessing ? (
+                                /* Processing State */
+                                <div className="p-8 text-center">
+                                    <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
+                                        <motion.div
+                                            animate={{ rotate: 360 }}
+                                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                        >
+                                            <CreditCard className="w-8 h-8 text-blue-500" />
+                                        </motion.div>
+                                    </div>
+                                    <h3 className="text-[18px] font-semibold text-[#171717] dark:text-white mb-2">Processing Payment</h3>
+                                    <p className="text-[14px] text-[#666] dark:text-[#888]">Please wait while we process your payment...</p>
+
+                                    {/* Razorpay-style loading bar */}
+                                    <div className="mt-6 h-1 bg-[#E5E5E5] dark:bg-[#333] rounded-full overflow-hidden">
+                                        <motion.div
+                                            initial={{ x: '-100%' }}
+                                            animate={{ x: '100%' }}
+                                            transition={{ duration: 1, repeat: Infinity }}
+                                            className="h-full w-1/2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
+                                        />
+                                    </div>
+                                </div>
+                            ) : (
+                                /* Success State */
+                                <div className="p-8 text-center">
+                                    {/* Razorpay-style success animation */}
+                                    <motion.div
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ type: 'spring', damping: 10, stiffness: 200 }}
+                                        className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg"
+                                    >
+                                        <motion.div
+                                            initial={{ scale: 0, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 1 }}
+                                            transition={{ delay: 0.2 }}
+                                        >
+                                            <CheckCircle className="w-10 h-10 text-white" />
+                                        </motion.div>
+                                    </motion.div>
+
+                                    <motion.h3
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.3 }}
+                                        className="text-[20px] font-bold text-[#171717] dark:text-white mb-2"
+                                    >
+                                        Payment Successful!
+                                    </motion.h3>
+
+                                    <motion.p
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: 0.4 }}
+                                        className="text-[14px] text-[#666] dark:text-[#888] mb-6"
+                                    >
+                                        Your order has been placed successfully
+                                    </motion.p>
+
+                                    {/* Order Details */}
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.5 }}
+                                        className="bg-[#F5F5F5] dark:bg-[#1A1A1A] rounded-xl p-4 mb-6"
+                                    >
+                                        <div className="flex items-center justify-between mb-3">
+                                            <span className="text-[13px] text-[#666] dark:text-[#888]">Order ID</span>
+                                            <span className="text-[13px] font-mono text-[#171717] dark:text-white">ORD{Date.now().toString().slice(-8)}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between mb-3">
+                                            <span className="text-[13px] text-[#666] dark:text-[#888]">Amount Paid</span>
+                                            <span className="text-[15px] font-bold text-emerald-600">₹{cartTotal}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[13px] text-[#666] dark:text-[#888]">Payment Method</span>
+                                            <span className="text-[13px] text-[#171717] dark:text-white">Razorpay</span>
+                                        </div>
+                                    </motion.div>
+
+                                    {/* Delivery Info */}
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.6 }}
+                                        className="flex items-center justify-center gap-4 mb-6 text-[13px] text-[#666] dark:text-[#888]"
+                                    >
+                                        <span className="flex items-center gap-1">
+                                            <Truck className="w-4 h-4 text-emerald-500" />
+                                            Free Delivery
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                            <Clock className="w-4 h-4 text-blue-500" />
+                                            2-3 Days
+                                        </span>
+                                    </motion.div>
+
+                                    <motion.button
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: 0.7 }}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={closePaymentModal}
+                                        className="w-full h-12 rounded-xl bg-[#171717] dark:bg-white text-white dark:text-[#171717] text-[14px] font-medium"
+                                    >
+                                        Continue Shopping
+                                    </motion.button>
+                                </div>
+                            )}
+
+                            {/* Razorpay Branding */}
+                            <div className="px-8 py-4 bg-[#F5F5F5] dark:bg-[#0A0A0A] flex items-center justify-center gap-2">
+                                <span className="text-[12px] text-[#999]">Secured by</span>
+                                <span className="text-[14px] font-bold text-blue-600">Razorpay</span>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }

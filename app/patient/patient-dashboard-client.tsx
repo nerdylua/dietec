@@ -46,10 +46,10 @@ const quickActions = [
 ]
 
 const stats = [
-    { label: 'Appointments', value: '0', desc: 'Upcoming this week', icon: Calendar, iconColor: 'text-blue-500', bgColor: 'bg-blue-50 dark:bg-blue-500/10', borderColor: 'hover:border-blue-300 dark:hover:border-blue-500/50', href: '/patient/appointments' },
-    { label: 'Prescriptions', value: '0', desc: 'Active medicines', icon: Pill, iconColor: 'text-emerald-500', bgColor: 'bg-emerald-50 dark:bg-emerald-500/10', borderColor: 'hover:border-emerald-300 dark:hover:border-emerald-500/50', href: '/patient/medicines' },
-    { label: 'Lab Tests', value: '0', desc: 'Pending results', icon: FlaskConical, iconColor: 'text-violet-500', bgColor: 'bg-violet-50 dark:bg-violet-500/10', borderColor: 'hover:border-violet-300 dark:hover:border-violet-500/50', href: '/patient/tests' },
-    { label: 'Health Score', value: '--', desc: 'Complete profile first', icon: Activity, iconColor: 'text-amber-500', bgColor: 'bg-amber-50 dark:bg-amber-500/10', borderColor: 'hover:border-amber-300 dark:hover:border-amber-500/50', href: '/patient/records' },
+    { label: 'Appointments', value: '2', desc: 'Upcoming this week', icon: Calendar, iconColor: 'text-blue-500', bgColor: 'bg-blue-50 dark:bg-blue-500/10', borderColor: 'hover:border-blue-300 dark:hover:border-blue-500/50', href: '/patient/appointments' },
+    { label: 'Prescriptions', value: '5', desc: 'Active medicines', icon: Pill, iconColor: 'text-emerald-500', bgColor: 'bg-emerald-50 dark:bg-emerald-500/10', borderColor: 'hover:border-emerald-300 dark:hover:border-emerald-500/50', href: '/patient/medicines' },
+    { label: 'Lab Tests', value: '1', desc: 'Pending results', icon: FlaskConical, iconColor: 'text-violet-500', bgColor: 'bg-violet-50 dark:bg-violet-500/10', borderColor: 'hover:border-violet-300 dark:hover:border-violet-500/50', href: '/patient/tests' },
+    { label: 'Health Score', value: '78', desc: 'Good condition', icon: Activity, iconColor: 'text-amber-500', bgColor: 'bg-amber-50 dark:bg-amber-500/10', borderColor: 'hover:border-amber-300 dark:hover:border-amber-500/50', href: '/patient/records' },
 ]
 
 interface PatientDashboardClientProps {
