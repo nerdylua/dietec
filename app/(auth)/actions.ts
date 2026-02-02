@@ -39,6 +39,44 @@ export async function login(formData: FormData) {
     redirect('/patient')
 }
 
+export async function doctorLogin(formData: FormData) {
+    const supabase = await createClient()
+
+    const data = {
+        email: formData.get('email') as string,
+        password: formData.get('password') as string,
+    }
+
+    const { error } = await supabase.auth.signInWithPassword(data)
+
+    if (error) {
+        return { error: error.message }
+    }
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        await supabase.auth.signOut()
+        return { error: 'Authentication failed' }
+    }
+
+    // Use service client to bypass RLS and check doctors table
+    const serviceClient = createServiceClient()
+    const { data: doctorData, error: doctorError } = await serviceClient
+        .from('doctors')
+        .select('id')
+        .eq('user_id', user.id)
+        .single()
+
+    if (doctorError || !doctorData) {
+        await supabase.auth.signOut()
+        return { error: 'Access denied. You are not registered as a doctor.' }
+    }
+
+    revalidatePath('/', 'layout')
+    redirect('/doctor')
+}
+
 export async function adminLogin(formData: FormData) {
     const supabase = await createClient()
 
@@ -53,7 +91,6 @@ export async function adminLogin(formData: FormData) {
         return { error: error.message }
     }
 
-    // Check if user exists in admins table
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -70,12 +107,10 @@ export async function adminLogin(formData: FormData) {
         .single()
 
     if (adminError || !adminData) {
-        // Not an admin - sign out and return error
         await supabase.auth.signOut()
         return { error: 'Access denied. You are not authorized as an administrator.' }
     }
 
-    // User is a valid admin
     revalidatePath('/', 'layout')
     redirect('/admin')
 }
