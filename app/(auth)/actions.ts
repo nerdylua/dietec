@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 
 export async function login(formData: FormData) {
     const supabase = await createClient()
@@ -31,14 +31,53 @@ export async function login(formData: FormData) {
 
         if (userData?.role === 'doctor') {
             redirect('/doctor')
-        } else if (userData?.role === 'admin') {
-            redirect('/admin')
         } else {
             redirect('/patient')
         }
     }
 
     redirect('/patient')
+}
+
+export async function adminLogin(formData: FormData) {
+    const supabase = await createClient()
+
+    const data = {
+        email: formData.get('email') as string,
+        password: formData.get('password') as string,
+    }
+
+    const { error } = await supabase.auth.signInWithPassword(data)
+
+    if (error) {
+        return { error: error.message }
+    }
+
+    // Check if user exists in admins table
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        await supabase.auth.signOut()
+        return { error: 'Authentication failed' }
+    }
+
+    // Use service client to bypass RLS and check admins table
+    const serviceClient = createServiceClient()
+    const { data: adminData, error: adminError } = await serviceClient
+        .from('admins')
+        .select('id')
+        .eq('user_id', user.id)
+        .single()
+
+    if (adminError || !adminData) {
+        // Not an admin - sign out and return error
+        await supabase.auth.signOut()
+        return { error: 'Access denied. You are not authorized as an administrator.' }
+    }
+
+    // User is a valid admin
+    revalidatePath('/', 'layout')
+    redirect('/admin')
 }
 
 export async function signup(formData: FormData) {
